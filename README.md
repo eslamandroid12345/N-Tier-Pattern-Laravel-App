@@ -44,10 +44,18 @@ Example of a Request Journey in an N-Tier System:
 When should I use N-Tier?
 Do NOT use it (Over-engineering): For small to medium-sized projects. Applying 6 layers to a simple project will make development incredibly slow and exhausting.
 Use it strictly: In financial systems (FinTech), massive e-commerce platforms, or any SaaS system where dozens of developers are expected to collaborate over many years.
+
+
 ###########################################################################################################
+
 (Presentation): الـ Controller يستقبل طلب دفع (Pay).
+
 (Security): الـ Middleware والـ Form Request يتأكدان أن المستخدم نشط وأن بيانات البطاقة صحيحة.
+
 (DTO): يتم تحويل بيانات البطاقة إلى PaymentDTO.
+
 (Business Logic): الـ PaymentService يستقبل الـ DTO ويقرر حساب الخصميات والضرائب.
+
 (Integration): الـ PaymentService يطلب من StripeClient تنفيذ عملية الدفع في البنك.
+
 (Data Access): بعد نجاح الدفع، يطلب الـ PaymentService من OrderRepository حفظ الفاتورة في قاعدة البيانات.
