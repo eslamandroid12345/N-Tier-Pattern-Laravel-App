@@ -83,5 +83,33 @@ class FirebaseProvider implements IFirebaseProvider
                 'response' => json_decode($response, true)
             ]);
         }
+
+        /*
+        $fileName = 'firebase_error-' . now()->format('Y-m-d') . '.log';
+        Log::build([
+            'driver' => 'single',
+            'path'   => storage_path('logs/' . $fileName),
+        ])->error('Failed to send Firebase notification (cURL Error).', [
+            'action'   => 'send_fcm_notification',
+            'endpoint' => $url,
+            'payload'  => $fcm,
+            'curl_err' => $err,
+        ]);
+
+
+         'channels' => [
+
+            // ... باقي القنوات الموجودة
+
+            'firebase_error' => [
+                'driver' => 'daily',
+                'path' => storage_path('logs/firebase_error.log'),
+                'level' => 'error',
+                'days' => 14, // يحتفظ بالملفات لمدة 14 يوم ثم يحذف القديم تلقائياً
+            ],
+
+        ],
+
+         */
     }
 }

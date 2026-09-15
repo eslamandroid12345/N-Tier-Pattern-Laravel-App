@@ -18,4 +18,10 @@ Route::get('/', function () {
    9-Added providers integration
    10-php artisan make:listener UserLoginListener --event=UserLogin
 
+/*
+    public function toDTO(): UserRegistrationDTO
+    {
+        return UserRegistrationDTO::fromRequest($this);
+    }
+
  */

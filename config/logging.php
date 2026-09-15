@@ -127,6 +127,14 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+
+        'login_website_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/login_website_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
+
     ],
 
 ];

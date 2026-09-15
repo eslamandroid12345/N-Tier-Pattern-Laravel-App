@@ -17,6 +17,7 @@ class UserDeviceResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->device,
+            'device_token' => $this->token,
         ];
     }
 }
