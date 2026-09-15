@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'notification' => $this->notifications,
             'dark_mode' => $this->dark_mode,
             'language' => $this->language,
-            'mobile' => $this->mobile,
+            'mobile' => $this->phone,
         ];
     }
 }

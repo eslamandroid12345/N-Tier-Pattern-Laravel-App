@@ -14,15 +14,15 @@ class AuthWebService extends AuthService
     {
         try {
             if (!auth()->attempt(['email' => $data['email'], 'password' => $data['password']])) {
-                return $this->apiHttpResponder->sendError(message: __('auth.unauthorized'), code: Http::UNPROCESSABLE_ENTITY);
+                return $this->apiHttpResponder->sendValidationError(message: 'Email or password not correct!');
             }
 
             $user = auth()->user();
             $device = null;
-            if (!empty($data['device']) && !empty($data['token'])) {
+            if (!empty($data['token'])) {
                 $device = $this->userDeviceRepository->updateOrCreate(
                     [
-                        'client_id' => $user->id,
+                        'user_id' => $user->id,
                         'device' => DeviceType::WEBSITE->value,
                         'token' => $data['token'],
                     ],
@@ -38,8 +38,12 @@ class AuthWebService extends AuthService
 
             ], message: 'User Login Successfully.');
 
-        }catch (\Exception $exception){
-            return $this->apiHttpResponder->sendError(message: 'Login Failed!');
+        } catch (\Exception $e) {
+            return $this->apiHttpResponder->sendError(message: 'Login user failed!',logs: [
+                "login/login_website_error",//file name
+                "Failed to login with website (Error!).",//message log
+                $e//exception
+            ]);
         }
     }
 
