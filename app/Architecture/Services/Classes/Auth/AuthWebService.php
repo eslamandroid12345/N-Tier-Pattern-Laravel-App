@@ -39,7 +39,6 @@ class AuthWebService extends AuthService
             ], message: 'User Login Successfully.');
 
         } catch (\Exception $e) {
-
             return $this->apiHttpResponder->sendError(message: 'Login user failed!',logs: [
                 "login/login_website_error",//file name
                 "Failed to login with website (Error!).",//message log
