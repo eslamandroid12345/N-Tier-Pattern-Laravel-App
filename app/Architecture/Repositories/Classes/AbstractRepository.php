@@ -126,12 +126,18 @@ abstract class AbstractRepository implements IAbstractRepository
     }
 
     public function getWithCondition(
-        $byColumn,
-        $value,
+        array $data,
         array $columns = ['*'],
         array $relations = [],
-    ): array|Collection {
-        return  $this->prepareQuery()->select($columns)->with($relations)->where($byColumn, $value)->get();
+        bool $isFirst = false
+    ): array|Collection|null|Model {
+        $query = $this->prepareQuery()->select($columns)->with($relations)->where($data);
+        if ($isFirst) {
+            return $query->first();
+        }
+
+        return $query->get();
+
     }
 
     public function getAll(

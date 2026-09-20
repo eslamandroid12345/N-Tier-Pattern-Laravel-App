@@ -135,6 +135,26 @@ return [
             'days' => 14,
         ],
 
+        'login_mobile_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/login_mobile_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
+
+        'login_verify_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/login_verify_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
+
+        'logout_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/logout_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
     ],
 
 ];

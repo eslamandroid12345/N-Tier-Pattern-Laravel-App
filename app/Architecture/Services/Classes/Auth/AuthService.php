@@ -9,7 +9,6 @@ use App\Architecture\Services\Interfaces\IAuthService;
 use App\Architecture\Services\Mutual\Interfaces\IFileManagerService;
 use App\Architecture\Services\Mutual\Interfaces\IOtpService;
 use App\Events\User\UserLogin;
-use App\Helpers\Http;
 use App\Http\Resources\User\UserDeviceResource;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +27,49 @@ abstract class AuthService implements IAuthService
     {
     }
 
+    //Verify login
+    public function verify(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $user = $this->userRepository->getByMobileNumber($data['phone']);
+            if (!$this->otpService->validateOTP($user->id, $data['code'])) {//Check if OTP found for this user
+                return $this->apiHttpResponder->sendValidationError(message: 'OTP for this user not exists!');
+            }
+            $this->otpService->clearOTP($user->id);
+            $device = null;
+            if (!empty($data['device']) && !empty($data['token'])) {//Register token with device type for user auth
+                $device =  $this->userDeviceRepository->updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'device'    => $data['device'],
+                        'token'    => $data['token'],
+                    ],
+                    []
+                );
+            }
+            UserLogin::dispatch($user);//Event Fire When User Login In System.
+            $this->userRepository->update(['id' => $user->id],['verified' => true]);
+            DB::commit();
+            return $this->apiHttpResponder->sendSuccess([
+                'token' => $user->createToken('MyAuthApp')->plainTextToken,
+                'device' => $device ? new UserDeviceResource($device) : null,
+                'user' => new UserResource($user),
+
+            ],message: 'User login successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiHttpResponder->sendError(
+                message: 'OTP verify error!',
+                logs: [
+                    'login/login_verify_error',
+                    'OTP Verify (Error!).',
+                    $e
+                ]
+            );
+        }
+    }
+
     public function register(array $data)
     {
         try {
@@ -42,7 +84,7 @@ abstract class AuthService implements IAuthService
             }
             return $this->apiHttpResponder->sendSuccess([
                 'mobile' => $data['mobile']
-            ],message: 'Code Send Successfully Please check your sms.'
+            ],message: 'Code send successfully,Please check your sms.'
             );
 
         } catch (\Exception $e) {
@@ -50,76 +92,6 @@ abstract class AuthService implements IAuthService
         }
     }
 
-    public function registerVerify(array $data)
-    {
-        DB::beginTransaction();
-        try {
-            $user = $this->userRepository->getByMobileNumber($data['mobile']);
-            if (!$this->otpService->validateOTP($user->id, $data['code'])) {
-                return $this->apiHttpResponder->sendError(message: 'Invalid OTP!');
-            }
-            $this->otpService->clearOTP($user->id);
-            $device = null;
-            if (!empty($data['device'])) {
-                $device =  $this->userDeviceRepository->updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'device'    => $data['device'],
-                        'token'    => $data['token'],
-                    ],
-                    []
-                );
-            }
-            UserLogin::dispatch($user);//Event Fire When User Login In System.
-            DB::commit();
-            return $this->apiHttpResponder->sendSuccess([
-                'token' => $user->createToken('MyAuthApp')->plainTextToken,
-                'user' => new UserResource($user),
-                'device' => $device ? new UserDeviceResource($device) : null,
-
-            ],message: 'User Register Successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->apiHttpResponder->sendError(message: 'Account Register Failed To Verify!');
-        }
-    }
-
-    //verify login
-    public function verify(array $data): JsonResponse
-    {
-        DB::beginTransaction();
-        try {
-            $user = $this->userRepository->getByMobileNumber($data['mobile']);
-            if (!$this->otpService->validateOTP($user->id, $data['code'])) {
-                return $this->apiHttpResponder->sendError(message: 'Invalid OTP!');
-            }
-            $device = null;
-            $this->otpService->clearOTP($user->id);
-
-            if (!empty($data['device']) && !empty($data['token'])) {
-                $device =  $this->userDeviceRepository->updateOrCreate(
-                    [
-                        'client_id' => $user->id,
-                        'device'    => $data['device'],
-                        'token'    => $data['token'],
-                    ],
-                    []
-                );
-            }
-
-            UserLogin::dispatch($user);//Event Fire When User Login In System.
-            DB::commit();
-            return $this->apiHttpResponder->sendSuccess([
-                    'token' => $user->createToken('MyAuthApp')->plainTextToken,
-                    'user' => new UserResource($user),
-                    'device' => $device ? new UserDeviceResource($device) : null,
-
-            ],message: 'User Account Verify Successfully');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->apiHttpResponder->sendError('OTP Not Found!',  Http::NOT_FOUND);
-        }
-    }
 
     public function resendCode(string $mobileNumber)
     {
@@ -201,19 +173,24 @@ abstract class AuthService implements IAuthService
     {
         DB::beginTransaction();
         try {
-            if (auth()->check()) {
 
-                if(!empty($data['device'])) {
-                    $this->userRepository->destroy($data['device']);
-                }
-                auth()->user()->tokens()->delete();
+            if(!empty($data['device'])) {
+                $this->userRepository->destroy($data['device']);
             }
+            auth()->user()->tokens()->delete();
 
             DB::commit();
-            return $this->apiHttpResponder->sendSuccess(message: 'Logout Successfully.');
+            return $this->apiHttpResponder->sendSuccess(message: 'User logout successfully.');
         }catch (\Exception $e) {
             DB::rollBack();
-            return $this->apiHttpResponder->sendError(message: 'Failed To Logout!');
+            return $this->apiHttpResponder->sendError(
+                message: 'Failed to logout!',
+                logs: [
+                    'login/logout_error',
+                    'User Logout (Error!).',
+                    $e
+                ]
+            );
         }
     }
 }

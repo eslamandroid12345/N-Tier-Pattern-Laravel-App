@@ -33,10 +33,10 @@ interface IAbstractRepository
     public function findOrFail($id, array $columns = ['*'], array $relations = []);
     public function getWith(array $with);
     public function getWithCondition(
-        $byColumn,
-        $value,
+        array $data,
         array $columns = ['*'],
         array $relations = [],
+        bool $isFirst = false
     );
     public function getAll(array $columns = ['*'], array $relations = [],);
     /* -----------------------------------------------------------------

@@ -23,6 +23,15 @@ class UserResource extends JsonResource
             'dark_mode' => $this->dark_mode,
             'language' => $this->language,
             'mobile' => $this->phone,
+            'permissions' => $this->role->permissions->map(function ($permission) {
+               return [
+                   'id' => $permission->id,
+                   'name' => $permission->name,
+                   'section' => $permission->section,
+                   'slug' => $permission->slug
+               ];
+            }),
+
         ];
     }
 }

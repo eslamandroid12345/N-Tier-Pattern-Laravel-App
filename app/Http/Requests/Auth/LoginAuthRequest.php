@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Architecture\DTO\Auth\UserLoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginAuthRequest extends FormRequest
@@ -14,19 +15,23 @@ class LoginAuthRequest extends FormRequest
     public function rules(): array
     {
 
-        return [
-            'email' => ['required', 'email','exists:users,email'],
+        return  [
+            'phone' => 'required|numeric|exists:users,phone',
             'password' => ['required'],
-            'token' => ['nullable'],
         ];
+    }
+
+    public function toDTO(): UserLoginDTO
+    {
+        return UserLoginDTO::fromRequest($this->validated());
     }
 
     public function messages(): array
     {
         return [
-            'email.required' => 'The email field is required.',
-            'email.email' => 'The email must be a valid email address.',
-            'email.exists' => 'The username does not exist.',
+            'phone.required' => 'The selected phone field is required.',
+            'phone.email' => 'The selected phone must be a valid number.',
+            'phone.exists' => 'The selected phone does not exist.',
             'password.required' => 'The password field is required.',
         ];
     }

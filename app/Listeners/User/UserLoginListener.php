@@ -62,7 +62,7 @@ class UserLoginListener
             'title_ar' => $messageContent['title_ar'],
             'content_en' => $messageContent['content_en'],
             'content_ar' => $messageContent['content_ar'],
-            'item' => $event->user->id,
+            'item' => null,
             'type' => $messageContent['type'],
         ];
         $this->notificationRepository->create($data);

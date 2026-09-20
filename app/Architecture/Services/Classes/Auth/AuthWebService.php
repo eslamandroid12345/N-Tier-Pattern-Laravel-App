@@ -2,49 +2,43 @@
 
 namespace App\Architecture\Services\Classes\Auth;
 
-use App\Enum\DeviceType;
-use App\Events\User\UserLogin;
 use App\Helpers\Http;
-use App\Http\Resources\User\UserDeviceResource;
-use App\Http\Resources\User\UserResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthWebService extends AuthService
 {
+
     public function login(array $data)
     {
+        DB::beginTransaction();
         try {
-            if (!auth()->attempt(['email' => $data['email'], 'password' => $data['password']])) {
-                return $this->apiHttpResponder->sendValidationError(message: 'Email or password not correct!');
-            }
+            $user = $this->userRepository->getByMobileNumber($data['phone']);
+            if($user->active == 0){
+                return $this->apiHttpResponder->sendError(message: 'User activation close,Please contact admin support.',code: Http::FORBIDDEN);
 
-            $user = auth()->user();
-            $device = null;
-            if (!empty($data['token'])) {
-                $device = $this->userDeviceRepository->updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'device' => DeviceType::WEBSITE->value,
-                        'token' => $data['token'],
-                    ],
-                    []
-                );
             }
-
-            UserLogin::dispatch($user);//Event Fire When User Login In System.
+            if (!$user || !Hash::check($data['password'], $user->password)) {
+                return $this->apiHttpResponder->sendValidationError('User data un correct!');
+            }
+            $otp = $this->otpService->generateOTP($user->id);
+            if (app()->environment('production')) {
+                $otp = 'Your sign-in OTP is: ' . $otp;
+                //Add service use to send sms for user
+            }
+            DB::commit();
             return $this->apiHttpResponder->sendSuccess([
-                'token' => $user->createToken('MyAuthApp')->plainTextToken,
-                'user' => new UserResource($user),
-                'device' => $device ? new UserDeviceResource($device) : null,
-
-            ], message: 'User Login Successfully.');
-
+                'user' => [
+                    'phone' => $data['phone'],
+                ]
+            ],message: 'Code send successfully,Please check your sms.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->apiHttpResponder->sendError(message: 'Login user failed!',logs: [
-                "login/login_website_error",//file name
-                "Failed to login with website (Error!).",//message log
+                'login/login_mobile_error',//file name
+                'Failed to login with mobile (Error!).',//message log
                 $e//exception
             ]);
         }
     }
-
 }
