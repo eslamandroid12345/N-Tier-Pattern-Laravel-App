@@ -15,9 +15,19 @@ class User extends Authenticatable
     use  HasApiTokens,HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'image',
         'email',
         'password',
+        'phone',
+        'verified',
+        'active',
+        'national_id',
+        'dark_mode',
+        'notifications',
+        'language',
+        'role_id'
     ];
 
     protected $hidden = [
@@ -29,7 +39,6 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
         ];
     }
 

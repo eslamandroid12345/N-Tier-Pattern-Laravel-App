@@ -48,7 +48,7 @@ class UserRepository extends AbstractRepository implements IUserRepository
 
     public function getByMobileNumber($mobile)
     {
-        return $this->prepareQuery()->where('mobile','=',$mobile)->first();
+        return $this->prepareQuery()->where('phone','=',$mobile)->first();
     }
 
 }

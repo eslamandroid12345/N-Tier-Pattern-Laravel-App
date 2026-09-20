@@ -12,9 +12,13 @@ class AuthMobileService extends AuthService
     {
         DB::beginTransaction();
         try {
-            $user = $this->userRepository->getByMobileNumber($data['mobile']);
+            $user = $this->userRepository->getByMobileNumber($data['phone']);
+            if($user->active == 0){
+                return $this->apiHttpResponder->sendError(message: 'User activation close,Please contact admin support.',code: Http::FORBIDDEN);
+
+            }
             if (!$user || !Hash::check($data['password'], $user->password)) {
-                return $this->apiHttpResponder->sendError(__('end-user/auth.unauthorized'),  Http::UNPROCESSABLE_ENTITY);
+                return $this->apiHttpResponder->sendValidationError('User data un correct!');
             }
             $otp = $this->otpService->generateOTP($user->id);
             if (app()->environment('production')) {
@@ -23,14 +27,17 @@ class AuthMobileService extends AuthService
             }
             DB::commit();
             return $this->apiHttpResponder->sendSuccess([
-                'message' => __('end-user/auth.otp_send'),
-                'data' => [
-                    'mobile' => $data['mobile'],
+                'user' => [
+                    'phone' => $data['phone'],
                 ]
-            ]);
+            ],message: 'Code send successfully,Please check your sms.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->apiHttpResponder->sendError(__('end-user/auth.error_login'));
+            return $this->apiHttpResponder->sendError(message: 'Login user failed!',logs: [
+                'login/login_mobile_error',//file name
+                'Failed to login with mobile (Error!).',//message log
+                $e//exception
+            ]);
         }
     }
 

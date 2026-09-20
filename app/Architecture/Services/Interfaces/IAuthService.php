@@ -4,7 +4,6 @@ namespace App\Architecture\Services\Interfaces;
 interface IAuthService
 {
     public function register(array $data);
-    public function registerVerify(array $data);
     public function login(array $data);
     public function verify(array $data);
     public function resendCode(string $mobileNumber);
