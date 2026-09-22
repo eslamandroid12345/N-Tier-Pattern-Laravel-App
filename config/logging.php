@@ -155,6 +155,13 @@ return [
             'level' => 'error',
             'days' => 14,
         ],
+
+        'user_register_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/user_register_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
     ],
 
 ];

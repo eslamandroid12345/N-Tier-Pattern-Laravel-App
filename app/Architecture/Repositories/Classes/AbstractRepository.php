@@ -5,6 +5,7 @@ use App\Architecture\Repositories\Interfaces\IAbstractRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 abstract class AbstractRepository implements IAbstractRepository
 {
@@ -16,7 +17,11 @@ abstract class AbstractRepository implements IAbstractRepository
 
     public function perPage(): int
     {
-        return 30;
+        return Cache::remember(
+            'settings.pagination_limits',
+            604800,
+            fn () => (int) (getSetting('pagination_limits') ?? 10)
+        );
     }
 
     public function prepareQuery(): Builder

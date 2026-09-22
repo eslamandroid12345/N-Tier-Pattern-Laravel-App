@@ -8,7 +8,7 @@ use App\Enum\DeviceType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class LogoutRequest extends FormRequest
+class UserLogoutRequest extends FormRequest
 {
     public function authorize(): bool
     {

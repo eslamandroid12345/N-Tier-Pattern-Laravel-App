@@ -17,6 +17,7 @@ class AuthMobileService extends AuthService
                 return $this->apiHttpResponder->sendError(message: 'User activation close,Please contact admin support.',code: Http::FORBIDDEN);
 
             }
+//            return $user;
             if (!$user || !Hash::check($data['password'], $user->password)) {
                 return $this->apiHttpResponder->sendValidationError('User data un correct!');
             }

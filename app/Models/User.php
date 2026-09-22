@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Architecture\Traits\LanguageToggle;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use  HasApiTokens,HasFactory, Notifiable;
+    use  HasApiTokens,HasFactory, Notifiable,LanguageToggle;
 
     protected $fillable = [
         'first_name',
