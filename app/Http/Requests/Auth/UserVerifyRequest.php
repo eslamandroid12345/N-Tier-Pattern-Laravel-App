@@ -7,7 +7,7 @@ use App\Enum\DeviceType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class VerifyRequest extends FormRequest
+class UserVerifyRequest extends FormRequest
 {
     public function authorize(): bool
     {

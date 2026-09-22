@@ -72,8 +72,8 @@ abstract class AuthService implements IAuthService
 
     public function register(array $data)
     {
+        DB::beginTransaction();
         try {
-            $data['password'] = Hash::make($data['password']);
             if (!empty($data['image'])) {
                 $data['image'] = $this->fileManagerService->handle('image','users/images');
             }
@@ -82,22 +82,30 @@ abstract class AuthService implements IAuthService
             if (app()->environment('production')) {
                 //Add service use to send sms for user
             }
+            DB::commit();
             return $this->apiHttpResponder->sendSuccess([
-                'mobile' => $data['mobile']
+                'phone' => $data['phone']
             ],message: 'Code send successfully,Please check your sms.'
             );
 
         } catch (\Exception $e) {
-            return $this->apiHttpResponder->sendError(message: 'Account Register Failed!');
+            DB::rollBack();
+            return $this->apiHttpResponder->sendError(
+                message: 'User Register Failed!',
+                logs: [
+                    'register/user_register_error',
+                    'User Register (Error!).',
+                    $e
+                ]
+            );
         }
     }
 
-
-    public function resendCode(string $mobileNumber)
+    public function resendCode(array $data)
     {
         DB::beginTransaction();
         try {
-            $user = $this->userRepository->getByMobileNumber($mobileNumber);
+            $user = $this->userRepository->getByMobileNumber($data['phone']);
             $newCode = $this->otpService->regenerateOTP($user->id);
             if (app()->environment('production')) {
                 //Add service use to send sms for user
@@ -106,51 +114,61 @@ abstract class AuthService implements IAuthService
             return $this->apiHttpResponder->sendSuccess(message: 'Code Resend Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->apiHttpResponder->sendError(message: 'Failed Generate New Code!');
+            return $this->apiHttpResponder->sendError(
+                message: 'Failed Generate New Code!',
+                logs: [
+                    'login/login_verify_error',
+                    'Failed Generate New Code (Error!).',
+                    $e
+                ]
+            );
         }
     }
 
+    public function profile()
+    {
+        try {
+            $user = auth()->user();
+            $user->load(['role']);
+            return $this->apiHttpResponder->sendSuccess([
+                'user'  => new UserResource($user),
+            ],message: 'Profile Data Get Successfully.');
+        }catch (\Exception $e) {
+            return $this->apiHttpResponder->sendError(
+                message: 'Failed To Load Profile Data!',
+                logs: [
+                    'login/login_verify_error',
+                    'Failed To Load Profile Data (Error!).',
+                    $e
+                ]
+            );
+        }
+
+    }
 
     public function changePassword(array $data)
     {
         try {
             $user = auth()->user();
             if (!Hash::check($data['old_password'],$user->password)) {
-                return $this->apiHttpResponder->sendValidationError(message: 'Old Password Not Correct.');
+                return $this->apiHttpResponder->sendValidationError(message: 'Old password not correct.');
             }
             if (Hash::check($data['new_password'], $user->password)) {
-                return $this->apiHttpResponder->sendValidationError(message: 'The New Password Is The Same Old Password!');
+                return $this->apiHttpResponder->sendValidationError(message: 'The new password is the same old password!');
             }
-            $this->userRepository->update(['id' => $user->id], ['password' => Hash::make($data['new_password'])]);
+            $this->userRepository->update(['id' => $user->id], ['password' => $data['new_password']]);
 
-            return $this->apiHttpResponder->sendSuccess(message: 'Password Updated Successfully.');
+            return $this->apiHttpResponder->sendSuccess(message: 'Password updated successfully.');
         } catch (\Exception $e) {
-            return $this->apiHttpResponder->sendError(message: 'Password Not Updated!');
+            return $this->apiHttpResponder->sendError(
+                message: 'Password Not Updated!',
+                logs: [
+                    'login/login_verify_error',
+                    'Password Not Updated (Error!).',
+                    $e
+                ]
+            );
         }
-    }
-
-    public function deleteAccount()
-    {
-        DB::beginTransaction();
-        try {
-            auth()->user()->tokens()->delete();//Remove tokens for user authentication
-            $this->userDeviceRepository->removeDeviceTokens();//Remove device tokens
-            $this->userRepository->destroy(auth()->id());//Destroy this user
-            DB::commit();
-            return $this->apiHttpResponder->sendSuccess(message: 'Account Deleted Successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->apiHttpResponder->sendError(message: 'Account Not Deleted!');
-        }
-    }
-
-    public function profile()
-    {
-        $user = auth()->user();
-        $user->load(['role']);
-        return $this->apiHttpResponder->sendSuccess([
-                'user'  => new UserResource($user),
-        ],message: 'Profile Data Get Successfully.');
     }
 
     public function updateProfile(array $data)
@@ -159,13 +177,22 @@ abstract class AuthService implements IAuthService
             $user = auth()->user();
             if (!empty($data['image'])) {
                 $data['image'] = $this->fileManagerService->handle('image','users/images', $user->getRawOriginal('image'));
+            }else {
+                unset($data['image']);
             }
             $user = $this->userRepository->update(['id' => auth()->id()], $data);
             return $this->apiHttpResponder->sendSuccess([
                     'user' => new UserResource($user),
             ],message: 'Profile Data Update Successfully.');
         } catch (\Exception $e) {
-            return $this->apiHttpResponder->sendError(message: 'Failed To Update Profile!');
+            return $this->apiHttpResponder->sendError(
+                message: 'Failed To Update Profile!',
+                logs: [
+                    'login/login_verify_error',
+                    'Failed To Update Profile (Error!).',
+                    $e
+                ]
+            );
         }
     }
 

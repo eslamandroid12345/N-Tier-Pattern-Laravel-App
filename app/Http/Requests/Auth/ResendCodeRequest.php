@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Architecture\DTO\Auth\ResendCodeDTO;
 use App\Architecture\DTO\Auth\UserLoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginAuthRequest extends FormRequest
+class ResendCodeRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -17,13 +18,12 @@ class LoginAuthRequest extends FormRequest
 
         return  [
             'phone' => 'required|numeric|exists:users,phone',
-            'password' => ['required'],
         ];
     }
 
-    public function toDTO(): UserLoginDTO
+    public function toDTO(): ResendCodeDTO
     {
-        return UserLoginDTO::fromRequest($this->validated());
+        return ResendCodeDTO::fromRequest($this->validated());
     }
 
     public function messages(): array
@@ -32,7 +32,6 @@ class LoginAuthRequest extends FormRequest
             'phone.required' => 'The selected phone field is required.',
             'phone.email' => 'The selected phone must be a valid number.',
             'phone.exists' => 'The selected phone does not exist.',
-            'password.required' => 'The password field is required.',
         ];
     }
 }
