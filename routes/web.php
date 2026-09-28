@@ -21,7 +21,7 @@ Route::get('/', function () {
 /*
     public function toDTO(): UserRegistrationDTO
     {
-        return UserRegistrationDTO::fromRequest($this);
+        return UserRegistrationDTO::fromRequest($this->validated());
     }
 
  */

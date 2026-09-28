@@ -16,13 +16,14 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'name' => $this->full_name,
             'image' => $this->image,
             'national_id' => $this->national_id,
             'notification' => $this->notifications,
             'dark_mode' => $this->dark_mode,
             'language' => $this->language,
-            'mobile' => $this->phone,
+            'phone' => $this->phone,
             'permissions' => $this->role->permissions->map(function ($permission) {
                return [
                    'id' => $permission->id,

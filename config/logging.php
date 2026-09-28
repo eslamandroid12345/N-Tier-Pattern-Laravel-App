@@ -162,6 +162,20 @@ return [
             'level' => 'error',
             'days' => 14,
         ],
+
+        'get_responder_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/get_responder_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
+
+        'permissions_access_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/permissions_access_error.log'),
+            'level' => 'error',
+            'days' => 14,
+        ],
     ],
 
 ];

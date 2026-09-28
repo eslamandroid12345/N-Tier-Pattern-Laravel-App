@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class UserSeeder extends Seeder
 
         DB::table('users')->insert([
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Ahmed',
                 'last_name' => 'Ali',
                 'email' => 'superadmin@example.com',
@@ -26,6 +28,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Rady',
                 'last_name' => 'Gamal',
                 'email' => 'admin.jane@example.com',
@@ -38,6 +41,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Sayed',
                 'last_name' => 'Hammed',
                 'email' => 'admin.mike@example.com',
@@ -50,6 +54,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Gamal',
                 'last_name' => 'Hesham',
                 'email' => 'admin.emily@example.com',
@@ -62,6 +67,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Mohammed',
                 'last_name' => 'Hassan',
                 'email' => 'viewer.david@example.com',
@@ -74,6 +80,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Sarah',
                 'last_name' => 'Rady',
                 'email' => 'viewer.sarah@example.com',
@@ -86,6 +93,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'James',
                 'last_name' => 'Wilson',
                 'email' => 'viewer.james@example.com',
@@ -98,6 +106,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Jessica',
                 'last_name' => 'Taylor',
                 'email' => 'viewer.jessica@example.com',
@@ -110,6 +119,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Daniel',
                 'last_name' => 'Anderson',
                 'email' => 'viewer.daniel@example.com',
@@ -122,6 +132,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'uuid'       => Str::uuid(),
                 'first_name' => 'Thomas',
                 'last_name' => 'Harris',
                 'email' => 'viewer.thomas@example.com',

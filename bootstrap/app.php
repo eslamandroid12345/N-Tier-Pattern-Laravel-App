@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Access;
 use App\Http\Middleware\LocalizeApi;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -11,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         using: function () {
             Route::group(['prefix' => 'api'], function () {
 
-                // ----------------- Website And Mobile Group Routes ------------------------//
+                // ----------------- website and mobile group routes ------------------------//
                 Route::prefix('website')->group(base_path('routes/website.php'));
                 Route::prefix('mobile')->group(base_path('routes/mobile.php'));
 
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'localize-api' => LocalizeApi::class,
+            'permission' => Access::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

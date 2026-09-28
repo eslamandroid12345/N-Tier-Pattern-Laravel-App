@@ -141,7 +141,7 @@ abstract class AbstractRepository implements IAbstractRepository
             return $query->first();
         }
 
-        return $query->get();
+        return $query->orderByDesc('id')->get();
 
     }
 
