@@ -3,7 +3,6 @@
 namespace App\Architecture\Responder;
 use App\Helpers\Http;
 use Exception;
-use Illuminate\Support\Facades\Log;
 use ReflectionMethod;
 
 class GetResponder implements IGetResponder
@@ -37,17 +36,22 @@ class GetResponder implements IGetResponder
             $executable = $repository->$method(...$args);
             $records = $is_instance ? new $resource($executable, ...$resource_parameters) : $resource::collection($executable);
 
-            $responseData = [
+            return [
                 'success' => true,
-                'message' => $message ?? __('messages.data_get'),
+                'message' => $message ?? 'Data Get Successfully.',
                 'code' => Http::OK,
-                'data' => $records,
+                'data' =>  $is_paginate ? $records->response()->getData(true) : $records
             ];
-            return $is_paginate ? $records->response()->getData(true) : $responseData;
         } catch (Exception $e) {
-            Log::error('CATCH::: '.now() . $e);
-//            return $e;
-            return $this->apiHttpResponder->sendError(message: $exception_message ?? __('messages.data_get_error'));
+
+            return $this->apiHttpResponder->sendError(
+                message:  $exception_message ?? 'Failed To Load Data (Error!).',
+                logs: [
+                    'get/get_responder_error',
+                    'Failed To Load Data (Error!).',
+                    $e
+                ]
+            );
         }
     }
 }

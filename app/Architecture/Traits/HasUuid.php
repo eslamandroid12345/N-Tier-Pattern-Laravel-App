@@ -7,17 +7,15 @@ use Illuminate\Support\Str;
 trait HasUuid
 {
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
         static::creating(function ($model) {
-            if (empty($model->{$this->uuid ?? 'uuid'})) {
-                $model->{$this->uuid ?? 'uuid'} = Str::uuid()->toString();
-            }
+            $model->uuid = (string) Str::uuid();
         });
     }
 
-    public function getIncrementing()
+    public function getIncrementing(): true
     {
         return true;
     }
