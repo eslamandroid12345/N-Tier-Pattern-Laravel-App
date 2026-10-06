@@ -17,7 +17,6 @@ interface IAbstractRepository
 
     public function destroy($id);
 
-    public function softDelete($id);
     public function restore($id);
     public function forceDelete($id);
     public function massDelete(array $Ids);
@@ -25,23 +24,16 @@ interface IAbstractRepository
     |  Fetching & Query Helpers
     | -----------------------------------------------------------------
     */
-    public function first();
     public function all(array $columns = ['*'],array $relations = []);
     public function withTrashed();
     public function onlyTrashed();
 
     public function findOrFail($id, array $columns = ['*'], array $relations = []);
-    public function getWith(array $with);
-    public function getWithCondition(
-        array $data,
+    public function getData(
+        array $conditions,
         array $columns = ['*'],
         array $relations = [],
-        bool $isFirst = false
+        bool $isFirst = false,
+        bool $isPagination = false
     );
-    public function getAll(array $columns = ['*'], array $relations = [],);
-    /* -----------------------------------------------------------------
-   |  Pagination
-   | -----------------------------------------------------------------
-   */
-    public function paginate(array $condition = [], array $relations = [], $orderBy = 'ASC', $columns = ['*']);
 }

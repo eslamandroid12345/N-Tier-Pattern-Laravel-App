@@ -22,6 +22,7 @@ class PlatformServiceInjector extends ServiceProvider
             'mobile' =>   AuthMobileService::class
         ],
 
+        //Add more services here
     ];
 
     public function detectPlatform($webService,$mobileService)

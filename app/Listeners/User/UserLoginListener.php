@@ -34,8 +34,8 @@ class UserLoginListener
             $huaweiTokens = $this->userDeviceRepository->huaweiTokens([$targetUser->id]);
             $webTokens = $this->userDeviceRepository->webTokens([$targetUser->id]);
 
-            $this->storeNotification($targetUser, $event, $messageContent);
-            $this->sendPushNotification($targetUser,$androidAndIosTokens,$huaweiTokens, $webTokens,$messageContent);
+            $this->storeNotification($targetUser,$messageContent);//Store notification before push with firebase provider
+            $this->sendPushNotification($targetUser,$androidAndIosTokens,$huaweiTokens, $webTokens,$messageContent);//Push message with firebase provider
 
         } catch (\Exception $e) {
            return;
@@ -48,13 +48,13 @@ class UserLoginListener
         return [
             'title_en' => 'Welcome,back to app.',
             'title_ar' => 'اهلا بك من جديد.',
-            'content_en' => 'Welcome,back to app.',
-            'content_ar' => 'اهلا بك من جديد.',
+            'content_en' => 'User Login Successfully.',
+            'content_ar' => 'تم تسجيل دخول المستخدم بنجاح.',
             'type' => NotificationType::GENERAL->value
         ];
     }
 
-    private function storeNotification($targetUser,UserLogin $event, array $messageContent): void
+    private function storeNotification($targetUser, array $messageContent): void
     {
         $data = [
             'user_id' => $targetUser->id,
