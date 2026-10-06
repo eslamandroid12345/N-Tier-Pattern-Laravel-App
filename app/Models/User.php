@@ -3,9 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Architecture\Accessors\User\FullName;
+use App\Architecture\Accessors\User\Image;
 use App\Architecture\Traits\HasUuid;
 use App\Architecture\Traits\LanguageToggle;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,6 +16,14 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use  HasApiTokens,HasFactory, Notifiable,LanguageToggle,HasUuid;
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+
+    use Image,FullName;
 
     protected $fillable = [
         'first_name',
@@ -42,25 +51,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
         ];
-    }
-
-    public function image() : Attribute {
-        return Attribute::get(
-            get: function ($value) {
-                if ($value !== null) {
-                    return url($value);
-                }
-                return url('storage/img.png');
-            }
-        );
-    }
-
-    public function fullName() : Attribute {
-        return Attribute::get(
-            get: function () {
-                return "{$this->first_name} {$this->last_name}";
-            }
-        );
     }
 
     public function role(): BelongsTo

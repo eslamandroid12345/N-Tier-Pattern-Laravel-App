@@ -60,12 +60,6 @@ abstract class AbstractRepository implements IAbstractRepository
         return $this->model->destroy($id);
     }
 
-    public function softDelete($id): ?bool
-    {
-        $model = $this->findOrFail($id);
-        return $model->delete();
-    }
-
     public function restore($id)
     {
         $model = $this->model->onlyTrashed()->findOrFail($id);
@@ -89,11 +83,6 @@ abstract class AbstractRepository implements IAbstractRepository
      |  Fetching & Query Helpers
      | -----------------------------------------------------------------
      */
-
-    public function first()
-    {
-        return $this->prepareQuery()->first();
-    }
 
     public function all(array $columns = ['*'],array $relations = []): Collection
     {
@@ -125,48 +114,35 @@ abstract class AbstractRepository implements IAbstractRepository
             ->with($relations)
             ->find($id);
     }
-    public function getWith(array $with): Collection
-    {
-        return $this->model->with($with)->get();
-    }
 
-    public function getWithCondition(
-        array $data,
+    public function getData(
+        array $conditions,
         array $columns = ['*'],
         array $relations = [],
-        bool $isFirst = false
-    ): array|Collection|null|Model {
-        $query = $this->prepareQuery()->select($columns)->with($relations)->where($data);
+        bool $isFirst = false,
+        bool $isPagination = false
+    ){
+        $query = $this->prepareQuery()->select($columns)->with($relations)->where($conditions)->orderByDesc('id');
+
+        /*
+      |----------------------------------------------------------------------------------------
+      | 1-$isFirst get object with conditions,relations,select columns from this model
+      | 2-$isPagination get array of objects with paginate limits from settings table
+      | 3-Default get array of objects with conditions,relations,select columns from this model
+      |----------------------------------------------------------------------------------------
+      */
         if ($isFirst) {
             return $query->first();
+        }
+
+        if($isPagination) {
+            return $query->paginate($this->perPage());
         }
 
         return $query->orderByDesc('id')->get();
 
     }
 
-    public function getAll(
-        array $columns = ['*'],
-        array $relations = [],
-    ): array|Collection {
-        return  $this->prepareQuery()->select($columns)->with($relations)->get();
-    }
 
-    /* -----------------------------------------------------------------
-    |  Pagination
-    | -----------------------------------------------------------------
-    */
-
-    public function paginate(array $condition = [], array $relations = [], $orderBy = 'ASC', $columns = ['*'])
-    {
-        $query = $this->prepareQuery();
-        if (!empty($condition)) {
-            $query->where($condition);
-        }
-        return $query->select($columns)
-            ->with($relations)
-            ->orderBy('id', $orderBy)
-            ->paginate($this->perPage());
-    }
 
 }
