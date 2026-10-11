@@ -20,17 +20,22 @@ return new class extends Migration
             $table->text('image')->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('phone')->nullable()->unique();
-            $table->boolean('verified')->default(false);
+            $table->boolean('verified')->nullable()->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('active')->default(true);
-            $table->bigInteger('national_id')->nullable();
-            $table->boolean('dark_mode')->default(false);
-            $table->boolean('notifications')->default(false);
-            $table->enum('language',['ar','en'])->default('ar');
+            $table->boolean('active')->nullable()->default(true);
+            $table->bigInteger('national_id')->nullable()->index();
+            $table->boolean('dark_mode')->nullable()->default(false);
+            $table->boolean('notifications')->nullable()->default(false);
+            $table->enum('language', ['ar', 'en'])->nullable()->default('ar');
             $table->foreignIdFor(Role::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
+
+
+            $table->index(['first_name', 'last_name'], 'users_full_name_index');
+            $table->fullText(['first_name', 'last_name'], 'users_name_fulltext');
+            $table->index(['role_id', 'active'], 'users_role_active_index');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

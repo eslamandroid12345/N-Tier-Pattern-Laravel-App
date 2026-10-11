@@ -10,17 +10,24 @@ use Illuminate\Support\Facades\Route;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         using: function () {
-            Route::group(['prefix' => 'api'], function () {
+            Route::middleware('api')->prefix('api')->group(function () {
 
                 // ----------------- website and mobile group routes ------------------------//
                 Route::prefix('website')->group(base_path('routes/website.php'));
                 Route::prefix('mobile')->group(base_path('routes/mobile.php'));
 
             });
+
+
+            // ----------------- dashboard group routes ------------------------//
+            Route::middleware('web')->prefix('dashboard')->group(base_path('routes/dashboard.php'));
+
         },
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo('/dashboard/login');
+        $middleware->redirectUsersTo('/dashboard/home');
         $middleware->alias([
             'localize-api' => LocalizeApi::class,
             'permission' => Access::class,

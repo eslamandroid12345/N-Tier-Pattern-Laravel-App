@@ -3,10 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Architecture\DTO\Auth\LogoutDTO;
-use App\Architecture\DTO\Auth\VerifyDTO;
-use App\Enum\DeviceType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UserLogoutRequest extends FormRequest
 {

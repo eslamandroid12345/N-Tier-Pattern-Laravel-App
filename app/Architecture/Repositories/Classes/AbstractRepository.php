@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Cache;
 
 abstract class AbstractRepository implements IAbstractRepository
 {
+    /**
+     * Cache TTL : مده الكاش الشهر بالثواني
+     */
+    protected const TTL = 60 * 60 * 24 * 30;
+
     public function __construct(
         public Model $model
     )
