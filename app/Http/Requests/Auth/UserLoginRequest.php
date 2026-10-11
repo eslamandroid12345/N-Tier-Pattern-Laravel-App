@@ -14,11 +14,16 @@ class UserLoginRequest extends FormRequest
 
     public function rules(): array
     {
-
-        return  [
-            'phone' => 'required|numeric|exists:users,phone',
+        $rules = [
             'password' => ['required'],
+
         ];
+
+        if(request()->is('dashboard/*')){
+            return array_merge($rules, ['email' => 'required|email|exists:users,email']);
+        }
+        return array_merge($rules, ['phone' => 'required|numeric|exists:users,phone']);
+
     }
 
     public function toDTO(): UserLoginDTO
@@ -30,8 +35,11 @@ class UserLoginRequest extends FormRequest
     {
         return [
             'phone.required' => 'The selected phone field is required.',
-            'phone.email' => 'The selected phone must be a valid number.',
+            'phone.numeric' => 'The selected phone must be a valid number.',
             'phone.exists' => 'The selected phone does not exist.',
+            'email.required' => 'The selected email field is required.',
+            'email.email' => 'The selected email must be a valid email.',
+            'email.exists' => 'The selected email does not exist.',
             'password.required' => 'The password field is required.',
         ];
     }

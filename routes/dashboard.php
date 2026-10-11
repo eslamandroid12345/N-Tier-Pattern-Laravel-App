@@ -1,14 +1,25 @@
 <?php
 
+use App\Http\Controllers\Dashboard\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+
+Route::middleware(['auth'])->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | AUTH
+    |--------------------------------------------------------------------------
+    */
+    Route::get('home', [AuthController::class, 'home'])->name('dashboard.home');
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
 });
 
-Route::get('/test', function () {
-    return view('welcome');
+Route::middleware(['guest'])->group(function () {
+    Route::get('login', [AuthController::class, 'view'])->name('login');
+    Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
 });
+
 
 /*
    1-php artisan install:api

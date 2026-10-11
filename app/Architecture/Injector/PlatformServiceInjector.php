@@ -2,6 +2,7 @@
 
 namespace App\Architecture\Injector;
 
+use App\Architecture\Services\Classes\Auth\AuthDashboardService;
 use App\Architecture\Services\Classes\Auth\AuthMobileService;
 use App\Architecture\Services\Classes\Auth\AuthService;
 use App\Architecture\Services\Classes\Auth\AuthWebService;
@@ -14,39 +15,42 @@ class PlatformServiceInjector extends ServiceProvider
 {
     private const SERVICES = [
         UserService::class => [
-            'website' =>  UserWebService::class,
-            'mobile' =>  UserMobileService::class//Add more platforms here
-        ],
-        AuthService::class => [
-            'website' =>  AuthWebService::class,
-            'mobile' =>   AuthMobileService::class
+            'website'   => UserWebService::class,
+            'mobile'    => UserMobileService::class,
         ],
 
-        //Add more services here
+        AuthService::class => [
+            'website'    => AuthWebService::class,//web service
+            'mobile'     => AuthMobileService::class,//mobile service
+            'dashboard'  => AuthDashboardService::class,//dashboard service
+        ],
     ];
 
-    public function detectPlatform($webService,$mobileService)
+    private const DEFAULT_PLATFORM = 'website';
+
+    public function detectPlatform(array $implementations): string
     {
-        if(request()->is('api/website/*')){
-           return $webService;
+        if (request()->is('api/mobile/*')) {
+            return 'mobile';
         }
 
-        if(request()->is('api/mobile/*')){
-            return $mobileService;
-        }//Add more platforms here
+        if (request()->is('dashboard/*')) {
+            return 'dashboard';
+        }
 
-        return $webService;
+        return self::DEFAULT_PLATFORM;
     }
-
 
     public function register(): void
     {
         foreach (self::SERVICES as $interface => $implementations) {
-            $webService = $implementations['website'];
-            $mobileService = $implementations['mobile'];//Add more platforms here
+            $this->app->singleton($interface, function ($app) use ($interface, $implementations) {
+                $platform = $this->detectPlatform($implementations);//dashboard or website or mobile
 
-            $this->app->singleton($interface, function ($app) use ($webService, $mobileService) {
-                return $app->make($this->detectPlatform($webService, $mobileService));//Add more platforms here
+                $implementation = $implementations[$platform]//$implementations['mobile']
+                 ?? $implementations[self::DEFAULT_PLATFORM];
+
+                return $app->make($implementation);
             });
         }
     }

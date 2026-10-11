@@ -11,7 +11,6 @@ use App\Architecture\Services\Mutual\Interfaces\IOtpService;
 use App\Events\User\UserLogin;
 use App\Http\Resources\User\UserDeviceResource;
 use App\Http\Resources\User\UserResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -196,7 +195,7 @@ abstract class AuthService implements IAuthService
         }
     }
 
-    public function logout(array $data): JsonResponse
+    public function logout(array $data)
     {
         DB::beginTransaction();
         try {

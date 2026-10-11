@@ -19,7 +19,7 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        $phone = '973' . (++static::$phoneSeq);
+        $phone = '985' . (++static::$phoneSeq);
 
         return [
             'uuid'              => Str::uuid(),
