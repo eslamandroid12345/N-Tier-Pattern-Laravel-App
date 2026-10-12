@@ -4,6 +4,7 @@ namespace App\Architecture\Providers\Classes;
 
 use App\Architecture\Providers\Interfaces\IFirebaseProvider;
 use App\Architecture\Repositories\Interfaces\IUserDeviceRepository;
+use App\Architecture\Responder\IApiHttpResponder;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Log;
 
@@ -11,6 +12,7 @@ class FirebaseProvider implements IFirebaseProvider
 {
     public function __construct(
         protected IUserDeviceRepository   $userDeviceRepository,
+        protected IApiHttpResponder       $apiHttpResponder,
     )
     {
     }
@@ -46,7 +48,7 @@ class FirebaseProvider implements IFirebaseProvider
 
         Log::channel('firebase_info')->info("Payload => {$payload}");
 
-        $url = 'https://fcm.googleapis.com/v1/projects/rdapp-client/messages:send';
+        $url = 'https://fcm.googleapis.com/v1/projects/initial-project/messages:send';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -68,7 +70,9 @@ class FirebaseProvider implements IFirebaseProvider
                 'endpoint'  => $url,
                 'payload'   => $fcm,
                 'curl_err'  => $err,
-            ]);            return response()->json([
+            ]);
+
+            return response()->json([
                 'message' => 'Curl Error: ' . $err
             ], 500);
         } else {

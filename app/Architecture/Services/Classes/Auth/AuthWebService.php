@@ -15,28 +15,32 @@ class AuthWebService extends AuthService
         try {
             $user = $this->userRepository->getByMobileNumber($data['phone']);
             if($user->active == 0){
-                return $this->apiHttpResponder->sendError(message: 'User activation close,Please contact admin support.',code: Http::FORBIDDEN);
+                return $this->apiHttpResponder->sendError(message: __('user/auth/login.account_inactive'),code: Http::FORBIDDEN);
 
             }
             if (!$user || !Hash::check($data['password'], $user->password)) {
-                return $this->apiHttpResponder->sendValidationError('User data un correct!');
+                return $this->apiHttpResponder->sendValidationError(__('user/auth/login.invalid_credentials'));
             }
             $otp = $this->otpService->generateOTP($user->id);
             if (app()->environment('production')) {
                 $otp = 'Your sign-in OTP is: ' . $otp;
-                //Add service use to send sms for user
+                /*
+                |--------------------------------------------------------------------------
+                | ADD SERVICE USED HERE TO SEND SMS
+                |--------------------------------------------------------------------------
+                */
             }
             DB::commit();
             return $this->apiHttpResponder->sendSuccess([
                 'user' => [
                     'phone' => $data['phone'],
                 ]
-            ],message: 'Code send successfully,Please check your sms.');
+            ],message: __('user/auth/login.code_sent'));
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(message: 'Login user failed!',logs: [
                 'login/login_mobile_error',//file name
-                'Failed to login with mobile (Error!).',//message log
+                __('user/auth/login.failed_login'),//message log
                 $e//exception
             ]);
         }

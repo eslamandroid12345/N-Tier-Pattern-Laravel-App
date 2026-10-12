@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware('localize-api')->group(function () {
 
 Route::post('register', [AuthController::class, 'register'])->name('website.register');
 Route::post('login', [AuthController::class, 'login'])->name('website.login');
@@ -22,4 +23,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('users', UserController::class);
     Route::get('users-list', [UserController::class,'list']);
     Route::post('logout', [AuthController::class, 'logout']);
+});
+
 });

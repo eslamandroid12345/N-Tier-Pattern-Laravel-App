@@ -17,11 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 Route::prefix('mobile')->group(base_path('routes/mobile.php'));
 
             });
-
-
-            // ----------------- dashboard group routes ------------------------//
-            Route::middleware('web')->prefix('dashboard')->group(base_path('routes/dashboard.php'));
-
         },
         commands: __DIR__.'/../routes/console.php',
     )
