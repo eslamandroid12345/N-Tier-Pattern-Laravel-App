@@ -22,44 +22,45 @@ abstract class AuthService implements IAuthService
         protected readonly IOtpService           $otpService,
         protected readonly IUserDeviceRepository $userDeviceRepository,
         protected readonly IFileManagerService   $fileManagerService,
-    )
-    {
+    ) {
     }
 
-    //Verify login
+    // Verify login
     public function verify(array $data)
     {
         DB::beginTransaction();
         try {
             $user = $this->userRepository->getByMobileNumber($data['phone']);
-            if (!$this->otpService->validateOTP($user->id, $data['code'])) {//Check if OTP found for this user
-                return $this->apiHttpResponder->sendValidationError(message: 'OTP for this user not exists!');
+            if (!$this->otpService->validateOTP($user->id, $data['code'])) { // Check if OTP found for this user
+                return $this->apiHttpResponder->sendValidationError(
+                    message: __('user/auth/login.otp_not_found')
+                );
             }
             $this->otpService->clearOTP($user->id);
             $device = null;
-            if (!empty($data['device']) && !empty($data['token'])) {//Register token with device type for user auth
-                $device =  $this->userDeviceRepository->updateOrCreate(
+            if (!empty($data['device']) && !empty($data['token'])) { // Register token with device type for user auth
+                $device = $this->userDeviceRepository->updateOrCreate(
                     [
                         'user_id' => $user->id,
-                        'device'    => $data['device'],
-                        'token'    => $data['token'],
+                        'device'  => $data['device'],
+                        'token'   => $data['token'],
                     ],
                     []
                 );
             }
-            UserLogin::dispatch($user);//Event Fire When User Login In System.
-            $this->userRepository->update(['id' => $user->id],['verified' => true]);
+            UserLogin::dispatch($user); // Event Fire When User Login In System.
+            $this->userRepository->update(['id' => $user->id], ['verified' => true]);
             DB::commit();
-            return $this->apiHttpResponder->sendSuccess([
-                'token' => $user->createToken('MyAuthApp')->plainTextToken,
-                'device' => $device ? new UserDeviceResource($device) : null,
-                'user' => new UserResource($user),
 
-            ],message: 'User login successfully.');
+            return $this->apiHttpResponder->sendSuccess([
+                'token'  => $user->createToken('MyAuthApp')->plainTextToken,
+                'device' => $device ? new UserDeviceResource($device) : null,
+                'user'   => new UserResource($user),
+            ], message: __('user/auth/login.login_success'));
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
-                message: 'OTP verify error!',
+                message: __('user/auth/login.verify_error'),
                 logs: [
                     'login/login_verify_error',
                     'OTP Verify (Error!).',
@@ -74,23 +75,27 @@ abstract class AuthService implements IAuthService
         DB::beginTransaction();
         try {
             if (!empty($data['image'])) {
-                $data['image'] = $this->fileManagerService->handle('image','users/images');
+                $data['image'] = $this->fileManagerService->handle('image', 'users/images');
             }
             $user = $this->userRepository->create($data);
             $otp = $this->otpService->generateOTP($user->id);
             if (app()->environment('production')) {
-                //Add service use to send sms for user
+                /*
+                |--------------------------------------------------------------------------
+                | ADD SERVICE USED HERE TO SEND SMS
+                |--------------------------------------------------------------------------
+                */
             }
             DB::commit();
+
             return $this->apiHttpResponder->sendSuccess([
                 'phone' => $data['phone']
-            ],message: 'Code send successfully,Please check your sms.'
-            );
+            ], message: __('user/auth/login.register_code_sent'));
 
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
-                message: 'User Register Failed!',
+                message: __('user/auth/login.register_failed'),
                 logs: [
                     'register/user_register_error',
                     'User Register (Error!).',
@@ -107,14 +112,17 @@ abstract class AuthService implements IAuthService
             $user = $this->userRepository->getByMobileNumber($data['phone']);
             $newCode = $this->otpService->regenerateOTP($user->id);
             if (app()->environment('production')) {
-                //Add service use to send sms for user
+                // Add service use to send sms for user
             }
             DB::commit();
-            return $this->apiHttpResponder->sendSuccess(message: 'Code Resend Successfully.');
+
+            return $this->apiHttpResponder->sendSuccess(
+                message: __('user/auth/login.code_resent')
+            );
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
-                message: 'Failed Generate New Code!',
+                message: __('user/auth/login.code_resend_failed'),
                 logs: [
                     'login/login_verify_error',
                     'Failed Generate New Code (Error!).',
@@ -129,12 +137,13 @@ abstract class AuthService implements IAuthService
         try {
             $user = auth()->user();
             $user->load(['role']);
+
             return $this->apiHttpResponder->sendSuccess([
-                'user'  => new UserResource($user),
-            ],message: 'Profile Data Get Successfully.');
-        }catch (\Exception $e) {
+                'user' => new UserResource($user),
+            ], message: __('user/auth/login.profile_get_success'));
+        } catch (\Exception $e) {
             return $this->apiHttpResponder->sendError(
-                message: 'Failed To Load Profile Data!',
+                message: __('user/auth/login.profile_get_failed'),
                 logs: [
                     'login/login_verify_error',
                     'Failed To Load Profile Data (Error!).',
@@ -142,25 +151,30 @@ abstract class AuthService implements IAuthService
                 ]
             );
         }
-
     }
 
     public function changePassword(array $data)
     {
         try {
             $user = auth()->user();
-            if (!Hash::check($data['old_password'],$user->password)) {
-                return $this->apiHttpResponder->sendValidationError(message: 'Old password not correct.');
+            if (!Hash::check($data['old_password'], $user->password)) {
+                return $this->apiHttpResponder->sendValidationError(
+                    message: __('user/auth/login.old_password_incorrect')
+                );
             }
             if (Hash::check($data['new_password'], $user->password)) {
-                return $this->apiHttpResponder->sendValidationError(message: 'The new password is the same old password!');
+                return $this->apiHttpResponder->sendValidationError(
+                    message: __('user/auth/login.same_password')
+                );
             }
             $this->userRepository->update(['id' => $user->id], ['password' => $data['new_password']]);
 
-            return $this->apiHttpResponder->sendSuccess(message: 'Password updated successfully.');
+            return $this->apiHttpResponder->sendSuccess(
+                message: __('user/auth/login.password_updated')
+            );
         } catch (\Exception $e) {
             return $this->apiHttpResponder->sendError(
-                message: 'Password Not Updated!',
+                message: __('user/auth/login.password_update_failed'),
                 logs: [
                     'login/login_verify_error',
                     'Password Not Updated (Error!).',
@@ -175,17 +189,22 @@ abstract class AuthService implements IAuthService
         try {
             $user = auth()->user();
             if (!empty($data['image'])) {
-                $data['image'] = $this->fileManagerService->handle('image','users/images', $user->getRawOriginal('image'));
-            }else {
+                $data['image'] = $this->fileManagerService->handle(
+                    'image',
+                    'users/images',
+                    $user->getRawOriginal('image')
+                );
+            } else {
                 unset($data['image']);
             }
             $user = $this->userRepository->update(['id' => auth()->id()], $data);
+
             return $this->apiHttpResponder->sendSuccess([
-                    'user' => new UserResource($user),
-            ],message: 'Profile Data Update Successfully.');
+                'user' => new UserResource($user),
+            ], message: __('user/auth/login.profile_update_success'));
         } catch (\Exception $e) {
             return $this->apiHttpResponder->sendError(
-                message: 'Failed To Update Profile!',
+                message: __('user/auth/login.profile_update_failed'),
                 logs: [
                     'login/login_verify_error',
                     'Failed To Update Profile (Error!).',
@@ -199,18 +218,20 @@ abstract class AuthService implements IAuthService
     {
         DB::beginTransaction();
         try {
-
-            if(!empty($data['device'])) {
+            if (!empty($data['device'])) {
                 $this->userRepository->destroy($data['device']);
             }
             auth()->user()->tokens()->delete();
 
             DB::commit();
-            return $this->apiHttpResponder->sendSuccess(message: 'User logout successfully.');
-        }catch (\Exception $e) {
+
+            return $this->apiHttpResponder->sendSuccess(
+                message: __('user/auth/login.logout_success')
+            );
+        } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
-                message: 'Failed to logout!',
+                message: __('user/auth/login.logout_failed'),
                 logs: [
                     'login/logout_error',
                     'User Logout (Error!).',

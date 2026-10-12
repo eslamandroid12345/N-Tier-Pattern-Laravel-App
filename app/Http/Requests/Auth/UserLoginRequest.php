@@ -34,13 +34,14 @@ class UserLoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phone.required' => 'The selected phone field is required.',
-            'phone.numeric' => 'The selected phone must be a valid number.',
-            'phone.exists' => 'The selected phone does not exist.',
-            'email.required' => 'The selected email field is required.',
-            'email.email' => 'The selected email must be a valid email.',
-            'email.exists' => 'The selected email does not exist.',
-            'password.required' => 'The password field is required.',
+            'phone.required'    => __('user/auth/login.phone.required'),
+            'phone.numeric'     => __('user/auth/login.phone.numeric'),
+            'phone.exists'      => __('user/auth/login.phone.exists'),
+            'email.required'    => __('user/auth/login.email.required'),
+            'email.email'       => __('user/auth/login.email.email'),
+            'email.exists'      => __('user/auth/login.email.exists'),
+            'password.required' => __('user/auth/login.password.required'),
         ];
     }
+
 }
