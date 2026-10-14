@@ -16,7 +16,9 @@ class UserObserver
          * users:filter:c4ca4238a0b923820dcc509a6f75849b
          * users:filter:9dcr4238a0b923820dcc509a6f75jmc4
          */
-        Cache::tags(['users_filter'])->flush();
+        Cache::forever('users_filter_version', time());//users filter
+        Cache::forever('users_list_version', time());//users list
+
     }
 
     /**
