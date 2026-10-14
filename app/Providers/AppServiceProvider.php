@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Validation\Rule;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Rule::macro('existsWithoutSoftDeletes', function ($table, $column = 'id') {
+            return Rule::exists($table, $column)->whereNull('deleted_at');
+        });
+
         /**
          * Models With Observers
          */

@@ -10,27 +10,10 @@ class UserRepository extends AbstractRepository implements IUserRepository
 {
     public function filter()
     {
-        /**
-         * Query Parameters: تجميع وترتيب كل معاملات البحث والصفحات
-         */
-        $params = request()->query();
 
-        /**
-         ترتيب الحقول عشان ?page=1&role=2 تدي نفس مفتاح ?role=2&page=1 *
-         */
-        ksort($params);
+        $cacheKey = getCacheSetting(key: 'users_filter_version',slug: 'users',action: 'filter');
 
-        /**
-         توليد مفتاح كاش فريد مشفّر بـ MD5 *
-         * Example : users:filter:c4ca4238a0b923820dcc509a6f75849b
-         */
-        $cacheKey = 'users:filter:' . md5(http_build_query($params));
-
-        /**
-         تخزين النتيجة في الكاش لمدة شهر *
-         */
-
-        return Cache::remember($cacheKey, self::TTL, function () {
+        return Cache::remember($cacheKey, getCacheTtl(), function () {
             $query = $this->prepareQuery();
             $query->when(request()->filled('id'), function ($q) {
                 $ids = explode(',', request()->input('id'));

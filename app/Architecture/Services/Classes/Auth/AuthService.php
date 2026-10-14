@@ -116,9 +116,7 @@ abstract class AuthService implements IAuthService
             }
             DB::commit();
 
-            return $this->apiHttpResponder->sendSuccess(
-                message: __('user/auth/login.code_resent')
-            );
+            return $this->apiHttpResponder->sendSuccess(message: __('user/auth/login.code_resent'));
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
@@ -158,20 +156,14 @@ abstract class AuthService implements IAuthService
         try {
             $user = auth()->user();
             if (!Hash::check($data['old_password'], $user->password)) {
-                return $this->apiHttpResponder->sendValidationError(
-                    message: __('user/auth/login.old_password_incorrect')
-                );
+                return $this->apiHttpResponder->sendValidationError(message: __('user/auth/login.old_password_incorrect'));
             }
             if (Hash::check($data['new_password'], $user->password)) {
-                return $this->apiHttpResponder->sendValidationError(
-                    message: __('user/auth/login.same_password')
-                );
+                return $this->apiHttpResponder->sendValidationError(message: __('user/auth/login.same_password'));
             }
             $this->userRepository->update(['id' => $user->id], ['password' => $data['new_password']]);
 
-            return $this->apiHttpResponder->sendSuccess(
-                message: __('user/auth/login.password_updated')
-            );
+            return $this->apiHttpResponder->sendSuccess(message: __('user/auth/login.password_updated'));
         } catch (\Exception $e) {
             return $this->apiHttpResponder->sendError(
                 message: __('user/auth/login.password_update_failed'),
@@ -189,11 +181,7 @@ abstract class AuthService implements IAuthService
         try {
             $user = auth()->user();
             if (!empty($data['image'])) {
-                $data['image'] = $this->fileManagerService->handle(
-                    'image',
-                    'users/images',
-                    $user->getRawOriginal('image')
-                );
+                $data['image'] = $this->fileManagerService->handle('image', 'users/images', $user->getRawOriginal('image'));
             } else {
                 unset($data['image']);
             }
@@ -225,9 +213,7 @@ abstract class AuthService implements IAuthService
 
             DB::commit();
 
-            return $this->apiHttpResponder->sendSuccess(
-                message: __('user/auth/login.logout_success')
-            );
+            return $this->apiHttpResponder->sendSuccess(message: __('user/auth/login.logout_success'));
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiHttpResponder->sendError(
