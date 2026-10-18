@@ -120,7 +120,7 @@ abstract class UserService implements IUserService
             $user = $this->userRepository->getData(conditions:['uuid' => $uuid],isFirst: true);
             $this->userRepository->destroy($user->id);
 
-            return $this->apiHttpResponder->sendSuccess(['message' => __('user/actions/user.user_delete_success')]);
+            return $this->apiHttpResponder->sendSuccess(message: __('user/actions/user.user_delete_success'));
         } catch (\Exception $e) {
 
             return $this->apiHttpResponder->sendError(
