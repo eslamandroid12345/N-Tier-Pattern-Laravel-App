@@ -30,7 +30,7 @@ abstract class AuthService implements IAuthService
     {
         DB::beginTransaction();
         try {
-            $user = $this->userRepository->getByMobileNumber($data['phone']);
+            $user = $this->userRepository->getData(['phone' => $data['phone']],isFirst: true);
             if (!$this->otpService->validateOTP($user->id, $data['code'])) { // Check if OTP found for this user
                 return $this->apiHttpResponder->sendValidationError(
                     message: __('user/auth/login.otp_not_found')

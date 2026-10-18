@@ -12,7 +12,7 @@ class AuthMobileService extends AuthService
     {
         DB::beginTransaction();
         try {
-            $user = $this->userRepository->getByMobileNumber($data['phone']);
+            $user = $this->userRepository->getData(['phone' => $data['phone']],isFirst: true);
             if($user->active == 0){
                 return $this->apiHttpResponder->sendError(message: __('user/auth/login.account_inactive'),code: Http::FORBIDDEN);
 

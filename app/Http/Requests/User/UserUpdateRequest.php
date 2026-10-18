@@ -3,28 +3,68 @@
 namespace App\Http\Requests\User;
 
 use App\Architecture\DTO\User\UserDTO;
+use App\Architecture\Repositories\Interfaces\IUserRepository;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
+
     public function authorize(): bool
     {
         return true;
     }
 
+    /*
+   |--------------------------------------------------------------------------
+   جلب المستخدم مرة واحدة فقط بالـ UUID لتوفير الاستعلامات |
+   |--------------------------------------------------------------------------
+   */
+    protected function getTargetUser(): ?User
+    {
+
+       $userRepository = app(IUserRepository::class);
+
+       return $userRepository->getData(
+           ['uuid' => $this->getUuid()],
+           columns:['id', 'uuid', 'email', 'phone', 'national_id'],
+           isFirst: true
+       );
+
+    }
+
     public function rules(): array
     {
+        $user = $this->getTargetUser();
+        $userId = $user?->id;
+
+        $emailRules = ['sometimes', 'string', 'email', 'max:255'];
+        if ($user && $this->filled('email') && $this->input('email') != $user->email) {
+            $emailRules[] = Rule::unique('users', 'email')->ignore($userId);
+        }
+
+
+        $phoneRules = ['sometimes', 'string'];
+        if ($user && $this->filled('phone') && $this->input('phone') != $user->phone) {
+            $phoneRules[] = Rule::unique('users', 'phone')->ignore($userId);
+        }
+
+        $nationalIdRules = ['sometimes', 'string', 'digits_between:1,20'];
+        if ($user && $this->filled('national_id') && $this->input('national_id') != $user->national_id) {
+            $nationalIdRules[] = Rule::unique('users', 'national_id')->ignore($userId);
+        }
+
         return [
-            'user'          =>  ['string', Rule::existsWithoutSoftDeletes('users', 'uuid')],
+            'user'          =>  ['required','string'],
             'image'         => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'first_name'    => ['sometimes', 'string', 'max:100'],
             'last_name'     => ['sometimes', 'string', 'max:100'],
-            'email'         => 'sometimes|string|email|max:255|unique:users,email,'.$this->getUuid().',uuid',
-            'phone'         => ['sometimes', 'numeric','unique:users,phone,'.$this->getUuid().',uuid'],
+            'email'         => $emailRules,
+            'phone'         => $phoneRules,
             'password'      => ['sometimes', 'string', 'min:8'],
             'role_id'       => ['sometimes', 'integer', 'exists:roles,id'],
-            'national_id'   => ['sometimes', 'integer', 'digits_between:1,20', 'unique:users,national_id,'.$this->getUuid().',uuid'],
+            'national_id'   => $nationalIdRules,
             'dark_mode'     => ['sometimes', 'boolean'],
             'notifications'      => ['sometimes','boolean'],
             'language'      => ['sometimes','boolean'],
@@ -40,6 +80,10 @@ class UserUpdateRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge($this->route()->parameters());
+
+        if (!$this->getTargetUser()) {
+            abort(404, __('user/actions/user.user.exists'));
+        }
     }
 
     public function getUuid(): mixed
@@ -51,7 +95,6 @@ class UserUpdateRequest extends FormRequest
     {
         return [
             'user.string'                  => __('user/actions/user.user.string'),
-            'user.exists'                  => __('user/actions/user.user.exists'),
             'image.image'                  => __('user/actions/user.image.image'),
             'image.mimes'                  => __('user/actions/user.image.mimes'),
             'image.max'                    => __('user/actions/user.image.max'),
