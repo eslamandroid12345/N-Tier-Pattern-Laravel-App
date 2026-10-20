@@ -1,0 +1,728 @@
+{
+	"info": {
+		"_postman_id": "ad246227-3b8b-4ad5-a0a0-ce878155dd85",
+		"name": "Mobile",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41549961",
+		"_collection_link": "https://restless-crater-677846.postman.co/workspace/Laravel-Projects~c305f941-5079-48c2-a089-0ee8d4146302/collection/41549961-ad246227-3b8b-4ad5-a0a0-ce878155dd85?action=share&source=collection_link&creator=41549961"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Send-OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "01092916047",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "01092916047",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}login",
+							"host": [
+								"{{mobile}}login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify-OTP",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "01092916047",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "5555",
+									"type": "text"
+								},
+								{
+									"key": "device",
+									"value": "android",
+									"type": "text"
+								},
+								{
+									"key": "token",
+									"value": "ppXnrHDNBDFGB-eeyfrFSVSCER:APA91bGSOa60kkayYF5r5bHhrT-qeotKtzKnr7adikP80vw9rp0OgX23yizFVSde0v1ocwrAVhVO9r4r23etzd__7yXNTRS9NsufJkWA2UaQlxoTywsIw0o",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}verify",
+							"host": [
+								"{{mobile}}verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "device",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}logout",
+							"host": [
+								"{{mobile}}logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Eslam",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Mohammed",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/PC/Music/466132721_122123678948494687_3399674974348405753_n.jpg"
+								},
+								{
+									"key": "email",
+									"value": "eslam123@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "01092916047",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "01092916047",
+									"type": "text"
+								},
+								{
+									"key": "role_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "national_id",
+									"value": "30007106789054",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}register",
+							"host": [
+								"{{mobile}}register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend-Code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "01092916047",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}resend/code",
+							"host": [
+								"{{mobile}}resend"
+							],
+							"path": [
+								"code"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Users-List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{mobile}}users-list",
+							"host": [
+								"{{mobile}}users-list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{mobile}}users",
+							"host": [
+								"{{mobile}}users"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1,2",
+									"disabled": true
+								},
+								{
+									"key": "role_id",
+									"value": "1,2",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "eslam123@gmail.com",
+									"disabled": true
+								},
+								{
+									"key": "phone",
+									"value": "01092916047",
+									"disabled": true
+								},
+								{
+									"key": "created_on_from",
+									"value": "2026-09-1",
+									"disabled": true
+								},
+								{
+									"key": "created_on_to",
+									"value": "2026-09-20",
+									"disabled": true
+								},
+								{
+									"key": "last_update_from",
+									"value": "2026-09-1",
+									"disabled": true
+								},
+								{
+									"key": "last_update_to",
+									"value": "2026-09-20",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Eslam",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Mohammed Ragab",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/PC/Music/466132721_122123678948494687_3399674974348405753_n.jpg"
+								},
+								{
+									"key": "phone",
+									"value": "01087400988",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "eslam090909@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "eslam090909@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "role_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "national_id",
+									"value": "9098709858",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}users",
+							"host": [
+								"{{mobile}}users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Rady",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Ali",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/PC/Music/466132721_122123678948494687_3399674974348405753_n.jpg"
+								},
+								{
+									"key": "phone",
+									"value": "01053988769",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "admin.jane@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "01053988769",
+									"type": "text"
+								},
+								{
+									"key": "role_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "national_id",
+									"value": "43098450987234",
+									"type": "text"
+								},
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}users/496aadb6-5bec-40bf-aa12-17bd701a1f9d",
+							"host": [
+								"{{mobile}}users"
+							],
+							"path": [
+								"496aadb6-5bec-40bf-aa12-17bd701a1f9d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{mobile}}users/496aadb6-5bec-40bf-aa12-17bd701a1f9d",
+							"host": [
+								"{{mobile}}users"
+							],
+							"path": [
+								"496aadb6-5bec-40bf-aa12-17bd701a1f9d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Update-Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Eslam",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Mohamed Ragab",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{mobile}}update-profile",
+							"host": [
+								"{{mobile}}update-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{mobile}}my-profile",
+							"host": [
+								"{{mobile}}my-profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Change-Password",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "old_password",
+							"value": "password123",
+							"type": "text"
+						},
+						{
+							"key": "new_password",
+							"value": "password1234",
+							"type": "text"
+						},
+						{
+							"key": "new_password_confirmation",
+							"value": "password1234",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{mobile}}change-password",
+					"host": [
+						"{{mobile}}change-password"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
