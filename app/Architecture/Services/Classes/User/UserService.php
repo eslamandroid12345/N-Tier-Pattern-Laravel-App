@@ -133,5 +133,4 @@ abstract class UserService implements IUserService
             );
         }
     }
-
 }
