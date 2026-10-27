@@ -10,7 +10,6 @@ use App\Architecture\Services\Mutual\Interfaces\IFileManagerService;
 use App\Http\Resources\User\UserResource;
 use App\Http\Resources\User\UsersListResource;
 use App\Http\Resources\User\UsersResource;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 abstract class UserService implements IUserService
@@ -19,30 +18,26 @@ abstract class UserService implements IUserService
        private readonly IUserRepository     $userRepository,
        private readonly IGetResponder       $getResponder,
        private readonly IFileManagerService $fileManagerService,
-       private readonly IApiHttpResponder   $apiHttpResponder
+       private readonly IApiHttpResponder   $apiHttpResponder,
    )
    {
    }
 
-
     public function index()
     {
-        return $this->getResponder->handle(
-            resource: UsersResource::class,
-            repository: $this->userRepository,
-            message: __('user/actions/user.users_get_success'),
-            exception_message: __('user/actions/user.users_get_failed'),
-            method: 'filter',
-            is_paginate: true
-        );
+            return $this->getResponder->handle(
+                resource: UsersResource::class,
+                repository: $this->userRepository,
+                message: __('user/actions/user.users_get_success'),
+                exception_message: __('user/actions/user.users_get_failed'),
+                method: 'filter',
+                is_paginate: true
+            );
     }
 
     public function list()
     {
-        $cacheKey = getCacheSetting(key: 'users_list_version', slug: 'users', action: 'list');
-
-        return Cache::remember($cacheKey, getCacheTtl(), function () {
-            return $this->getResponder->handle(
+        return $this->getResponder->handle(
                 resource: UsersListResource::class,
                 repository: $this->userRepository,
                 message: __('user/actions/user.users_get_success'),
@@ -55,9 +50,8 @@ abstract class UserService implements IUserService
                 ],
                 is_paginate: true
             );
-        });
-    }
 
+    }
 
     public function store(array $data){
 
