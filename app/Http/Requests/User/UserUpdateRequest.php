@@ -72,9 +72,11 @@ class UserUpdateRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): UserDTO
+    public function toDTO(): array
     {
-        return UserDTO::fromRequest($this->validated());
+        $data = UserDTO::fromRequest($this->validated());
+
+        return array_filter((array)$data, fn ($value) => !is_null($value));
     }
 
     protected function prepareForValidation(): void

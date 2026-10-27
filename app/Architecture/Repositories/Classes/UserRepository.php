@@ -3,17 +3,12 @@
 namespace App\Architecture\Repositories\Classes;
 
 use App\Architecture\Repositories\Interfaces\IUserRepository;
-use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class UserRepository extends AbstractRepository implements IUserRepository
 {
     public function filter()
     {
-
-        $cacheKey = getCacheSetting(key: 'users_filter_version',slug: 'users',action: 'filter');
-
-        return Cache::remember($cacheKey, getCacheTtl(), function () {
             $query = $this->prepareQuery();
             $query->when(request()->filled('id'), function ($q) {
                 $ids = explode(',', request()->input('id'));
@@ -23,12 +18,25 @@ class UserRepository extends AbstractRepository implements IUserRepository
                 $role_ids = explode(',', request()->input('role_id'));
                 $q->whereIn('role_id', $role_ids);
             });
+
             $query->when(request()->filled('email'), function ($q) {
-                $q->where('email', 'like', '%' . request()->input('email') . '%');
+                $email = trim(request()->input('email'));
+
+                // لو المستخدم كاتب إيميل كامل فيه علامة @ ابحث بالتطابق التام فوراً (0.001 ثانية)
+                if (str_contains($email, '@')) {
+                    $q->where('email', $email);
+                } else {
+                    // لو كاتب أول الإيميل بس، ابحث من البداية بدون % في الأول (0.01 ثانية بالـ Index)
+                    $q->where('email', 'like', $email . '%');
+                }
             });
+
+
             $query->when(request()->filled('phone'), function ($q) {
-                $q->where('phone', 'like', '%' . request()->input('phone') . '%');
-            });
+                    $q->where('phone', '=', request()->input('phone'));
+                });
+
+
             $query->when(request()->filled('created_on_from'), function ($q) {
                 $q->where('created_at', '>=', Carbon::parse(request()->input('created_on_from'))->startOfDay());
             });
@@ -42,12 +50,11 @@ class UserRepository extends AbstractRepository implements IUserRepository
                 $q->where('updated_at', '<=', Carbon::parse(request()->input('last_update_to'))->endOfDay());
             });
             return $query
-                ->select('id', 'first_name', 'last_name', 'email', 'phone', 'role_id', 'created_at', 'updated_at')
-                ->where('active', 1)
+                ->select('id', 'first_name', 'last_name', 'email', 'phone', 'role_id', 'image', 'national_id', 'created_at', 'updated_at')
                 ->with(['role:id,name'])
                 ->orderByDesc('id')
                 ->paginate($this->perPage());
-        });
+
     }
 
 
